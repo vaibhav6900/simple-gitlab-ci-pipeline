@@ -10,12 +10,16 @@ build_image:
   stage: build
   script:
     - docker build -t $IMAGE_NAME .
+  tags:
+  - dev  
 
 push_image:
   stage: push
   script:
     - echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin
     - docker push $IMAGE_NAME
+  tags:
+  - dev  
 
 deploy_app:
   stage: deploy
@@ -24,5 +28,7 @@ deploy_app:
     - docker rm app || true
     - docker pull $IMAGE_NAME
     - docker run -d --name app -p 3000:3000 $IMAGE_NAME
+  tags:
+  - dev  
   only:
     - main
