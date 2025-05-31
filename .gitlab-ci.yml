@@ -1,0 +1,28 @@
+stages:
+  - build
+  - push
+  - deploy
+
+variables:
+  IMAGE_NAME: vaibh6900/node-ci-cd:latest
+
+build_image:
+  stage: build
+  script:
+    - docker build -t $IMAGE_NAME .
+
+push_image:
+  stage: push
+  script:
+    - echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin
+    - docker push $IMAGE_NAME
+
+deploy_app:
+  stage: deploy
+  script:
+    - docker stop app || true
+    - docker rm app || true
+    - docker pull $IMAGE_NAME
+    - docker run -d --name app -p 3000:3000 $IMAGE_NAME
+  only:
+    - main
